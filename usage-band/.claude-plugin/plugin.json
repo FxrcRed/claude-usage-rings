@@ -1,6 +1,6 @@
 {
   "name": "usage-band",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Shows 5-hour / weekly plan usage as activity rings above the prompt, plus a context-length hint, and feeds the optional tray icon",
   "types": "./types/index.d.ts",
   "author": {
