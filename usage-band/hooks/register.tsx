@@ -5,12 +5,14 @@ import type { Limit } from '../types'
 
 const limits = atom({ plugin: 'usage-band', key: 'limits' } as const, [] as Limit[])
 
-const shade = (p: number) =>
-  p >= 85 ? { ring: p >= 90 ? '#d70015' : '#f5362b', text: '#d70015' }
-  : p >= 60 ? { ring: '#ff9f0a', text: '#c77700' }
-  : { ring: '#62b800', text: '#3f8a00' }
+// Apple system colours; the text tones sit between Apple's light and dark variants so they read on both themes
+const GREEN = { ring: '#34c759', text: '#2a9d4b' }
+const ORANGE = { ring: '#ff9500', text: '#e07800' }
+const RED = { ring: '#ff3b30', text: '#ee3a30' }
 
-const ctxColor = (t: number) => (t >= 230000 ? '#d70015' : t >= 180000 ? '#c77700' : undefined)
+const shade = (p: number) => (p >= 85 ? RED : p >= 60 ? ORANGE : GREEN)
+
+const ctxColor = (t: number) => (t >= 230000 ? RED.text : t >= 180000 ? ORANGE.text : undefined)
 
 const left = (iso: string | undefined, now: number) => {
   if (!iso) return ''
@@ -87,12 +89,12 @@ export const register: Register = on => {
             </Text>
           ) : null}
         {ctx && ctx >= 180000 ? (
-          <Text size="caption" color={ctx >= 230000 ? '#d70015' : '#c77700'}>Time to start a new chat</Text>
+          <Text size="caption" color={ctx >= 230000 ? RED.text : ORANGE.text}>Time to start a new chat</Text>
         ) : ctx ? (
           <Text size="caption" dimColor>Fine to keep going here</Text>
         ) : null}
         {(five?.percentUsed ?? 0) >= 90 ? (
-          <Text size="caption" color="#d70015">5-hour limit almost used</Text>
+          <Text size="caption" color={RED.text}>5-hour limit almost used</Text>
         ) : null}
       </Box>
       <Box flexDirection="row" alignItems="center" gap={1}>

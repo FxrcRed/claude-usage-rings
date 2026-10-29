@@ -45,14 +45,14 @@ Answer `y` to add the marketplace, then pick a scope. The band is active right a
 
 ## Optional: Windows tray icon
 
-`tray/` contains a separate, optional tray icon that shows the 5-hour percentage (green / orange / red) with a tooltip of progress bars. Windows only.
+`tray/` contains a separate, optional tray icon that shows the 5-hour percentage on a green / orange / red icon. Click it to open a small card with the 5-hour and weekly rings, reset times and when the data was last updated (Esc or a click elsewhere closes it). Windows only.
 
 ```
 pip install -r tray/requirements.txt
 pythonw tray/tray.py
 ```
 
-The tray reads `~/.claude/tray-state.json`, which the usage-band mod keeps up to date automatically in the desktop app and the CLI: install the mod, start the tray, done. The tooltip's "Running" count only works if you also use `tray/statusline.py` as the `statusLine` command in `~/.claude/settings.json` (terminal CLI only, optional):
+The tray reads `~/.claude/tray-state.json`, which the usage-band mod keeps up to date automatically in the desktop app and the CLI: install the mod, start the tray, done. Without the mod, the terminal CLI can feed it instead through `tray/statusline.py` as the `statusLine` command in `~/.claude/settings.json`:
 
 ```json
 { "statusLine": { "type": "command", "command": "python /path/to/tray/statusline.py" } }
