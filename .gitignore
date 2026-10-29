@@ -2,4 +2,4 @@ __pycache__/
 *.pyc
 *.log
 .DS_Store
-usage-band/.claude-plugin/types/
+usage-rings/.claude-plugin/types/

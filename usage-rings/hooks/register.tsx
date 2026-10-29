@@ -3,7 +3,7 @@ import type { Register } from 'claude-code'
 
 import type { Limit } from '../types'
 
-const limits = atom({ plugin: 'usage-band', key: 'limits' } as const, [] as Limit[])
+const limits = atom({ plugin: 'usage-rings', key: 'limits' } as const, [] as Limit[])
 
 // Apple system colours; the text tones sit between Apple's light and dark variants so they read on both themes
 const GREEN = { ring: '#34c759', text: '#2a9d4b' }
@@ -78,7 +78,7 @@ export const register: Register = on => {
     if (e.rateLimits.length > 0) {
       const five = pick(e.rateLimits, 'five_hour')
       const week = pick(e.rateLimits, 'seven_day')
-      // Optional tray feed: ~/.claude/tray-state.json (see usage-band/tray/ in the repo); a window missing from this
+      // Optional tray feed: ~/.claude/tray-state.json (see usage-rings/tray/ in the repo); a window missing from this
       // reply keeps its last value instead of being dropped
       const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
       const file = home ? `${home.replaceAll('\\', '/')}/.claude/tray-state.json` : undefined

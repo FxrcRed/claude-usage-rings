@@ -1,12 +1,12 @@
 {
-  "name": "usage-band",
+  "name": "usage-rings",
   "owner": {
     "name": "FxrcRed"
   },
   "plugins": [
     {
-      "name": "usage-band",
-      "source": "./usage-band",
+      "name": "usage-rings",
+      "source": "./usage-rings",
       "description": "Live 5-hour and weekly Claude plan usage rings above the prompt in the Claude desktop app, plus a context-length hint and an optional Windows tray icon"
     }
   ]

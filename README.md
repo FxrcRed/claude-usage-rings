@@ -22,13 +22,13 @@ You need Claude Code 2.1.287 or later and a Claude plan that reports rate-limit 
 In a terminal session of Claude Code:
 
 ```
-/plugin install usage-band --marketplace FxrcRed/claude-usage-rings
+/plugin install usage-rings --marketplace FxrcRed/claude-usage-rings
 ```
 
 From a shell:
 
 ```
-claude plugin install usage-band --marketplace FxrcRed/claude-usage-rings
+claude plugin install usage-rings --marketplace FxrcRed/claude-usage-rings
 ```
 
 In the desktop app, where `/plugin` does not run: click **+** next to the prompt box, then **Plugins**, **Add marketplace** with `FxrcRed/claude-usage-rings`, then **Add plugin**.
@@ -50,7 +50,7 @@ The context figures include roughly 80k tokens of fixed overhead (system prompt,
 
 On Windows the mod also sets up a tray icon that shows the 5-hour percentage on a green / orange / red icon. Click it to open a small card with the 5-hour and weekly rings, reset times and when the data was last updated (Esc or a click elsewhere closes it).
 
-Nothing to run: when a session starts, the mod runs `usage-band/tray/ensure-tray.ps1`, which
+Nothing to run: when a session starts, the mod runs `usage-rings/tray/ensure-tray.ps1`, which
 - installs `pillow` and `pystray` with pip if they are missing (needs Python on `PATH`),
 - adds `ClaudeTray.lnk` to your Startup folder so the icon returns after a reboot,
 - starts the icon (only one runs at a time).
@@ -61,8 +61,8 @@ If Python is not installed, the script quietly does nothing and the band works o
 
 To remove it: disable or uninstall the plugin first (otherwise the icon comes back within a minute), then quit the icon from its right-click menu and delete `ClaudeTray.lnk` from the Startup folder (`shell:startup`).
 
-The band and the tray share `~/.claude/tray-state.json`, which the mod updates after every reply. A fresh or resumed session shows the last known values until its first reply. Without the mod, the terminal CLI can feed the tray through `usage-band/tray/statusline.py` as the `statusLine` command in `~/.claude/settings.json`:
+The band and the tray share `~/.claude/tray-state.json`, which the mod updates after every reply. A fresh or resumed session shows the last known values until its first reply. Without the mod, the terminal CLI can feed the tray through `usage-rings/tray/statusline.py` as the `statusLine` command in `~/.claude/settings.json`:
 
 ```json
-{ "statusLine": { "type": "command", "command": "python /path/to/usage-band/tray/statusline.py" } }
+{ "statusLine": { "type": "command", "command": "python /path/to/usage-rings/tray/statusline.py" } }
 ```
