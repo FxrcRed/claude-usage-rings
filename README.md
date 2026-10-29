@@ -18,7 +18,7 @@ It is a Claude Code plugin (a "mod" that draws UI above the prompt), installed i
 
 ## Install
 
-You need Claude Code 2.1.275 or later and a Claude plan that reports rate-limit data (Pro or Max).
+You need Claude Code 2.1.287 or later and a Claude plan that reports rate-limit data (Pro or Max).
 
 In a terminal session of Claude Code:
 
@@ -74,7 +74,7 @@ Right-click the icon and choose **Quit** to exit. On Windows 11, drag the icon o
 
 ## Troubleshooting
 
-- **The band does not appear**: send one message first, because the usage numbers arrive with the first API response of a session. Also check that your plan is Pro or Max and that Claude Code is 2.1.275 or later.
+- **The band does not appear**: send one message first, because the usage numbers arrive with the first API response of a session. Also check that your plan is Pro or Max and that Claude Code is 2.1.287 or later.
 - **The numbers do not change**: they refresh when a message is sent, not continuously, so an idle session keeps its last values.
 - **The tray icon shows `--`**: the tray has had no update for 30 minutes, or the reset time of the window has passed. Send a message in any session with the plugin installed.
 
