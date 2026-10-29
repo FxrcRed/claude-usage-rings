@@ -4,8 +4,8 @@
 
 <p align="center">
   <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/usage-band-dark.png">
-    <img alt="The usage band above the prompt box: context size, 5-hour percent and time left, and a usage ring" src="docs/usage-band-light.png" width="720">
+    <source media="(prefers-color-scheme: dark)" srcset="docs/hero-dark.png">
+    <img alt="Claude plan usage at a glance: the usage band above the prompt box, the Windows tray icon with the 5-hour percentage, and the tray card with 5-hour and weekly rings" src="docs/hero-light.png" width="800">
   </picture>
 </p>
 
