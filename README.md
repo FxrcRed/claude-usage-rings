@@ -1,6 +1,6 @@
 # Claude usage rings
 
-**See your Claude plan usage limit at a glance: a live 5-hour and weekly usage indicator above the prompt box of the Claude desktop app (Claude Code), so you no longer have to click the ring at the bottom right of the window just to read the percentage. Plus an optional Windows tray icon.**
+**See your Claude plan usage limit at a glance: a live 5-hour and weekly usage indicator above the prompt box of the Claude desktop app (Claude Code), so you no longer have to click the ring at the bottom right of the window just to read the percentage. On Windows, a tray icon is set up for you too.**
 
 <p align="center">
   <img alt="Claude plan usage at a glance: the usage band above the prompt box in light and dark, the tray card with 5-hour and weekly rings, and the Windows tray icon showing the 5-hour percentage" src="docs/hero.png" width="800">
@@ -12,7 +12,7 @@ Anyone on a Claude Pro or Max plan eventually asks "how much of my 5-hour limit 
 - **Weekly limit**: percent used and time until it resets
 - **Context length**: current conversation size in tokens, with a nudge to start a new chat
 - **Colors**: green below 60%, orange 60–85%, red from 85% (Apple system colors)
-- **Optional Windows tray icon**: the 5-hour percentage on the icon, click for a small card with both rings
+- **Windows tray icon** (installed automatically): the 5-hour percentage on the icon, click for a small card with both rings
 
 It is a Claude Code plugin (a "mod" that draws UI above the prompt), installed in one line from this repository.
 
@@ -34,7 +34,7 @@ claude plugin install usage-band --marketplace FxrcRed/claude-usage-rings
 
 In the desktop app, where `/plugin` does not run: click **+** next to the prompt box, then **Plugins**, **Add marketplace** with `FxrcRed/claude-usage-rings`, then **Add plugin**.
 
-Answer `y` to add the marketplace and pick a scope (user scope = every session). The band shows up above the prompt after the first reply in a session, because the usage numbers arrive with the first API response.
+Answer `y` to add the marketplace and pick a scope (user scope = every session). The band shows up above the prompt in every session. Until a session's first reply it shows the last known numbers (kept in `~/.claude/tray-state.json`); after that it is live.
 
 ## What the band shows
 
@@ -51,15 +51,15 @@ The context figures include roughly 80k tokens of fixed overhead (system prompt,
 
 On Windows the mod also sets up a tray icon that shows the 5-hour percentage on a green / orange / red icon. Click it to open a small card with the 5-hour and weekly rings, reset times and when the data was last updated (Esc or a click elsewhere closes it).
 
-Nothing to run: the first time a session starts, the mod runs `tray/ensure-tray.ps1`, which
+Nothing to run: the first time a session starts, the mod runs `usage-band/tray/ensure-tray.ps1`, which
 - installs `pillow` and `pystray` with pip if they are missing (needs Python on `PATH`),
 - adds `ClaudeTray.lnk` to your Startup folder so the icon returns after a reboot,
 - starts the icon.
 
 If Python is not installed, the script quietly does nothing and the band works on its own. Windows 11 keeps new icons in the `^` overflow: drag it onto the taskbar once to keep it visible. To remove it, delete `ClaudeTray.lnk` from the Startup folder (`shell:startup`) and quit the icon from its right-click menu.
 
-The band and the tray share `~/.claude/tray-state.json`, which the mod updates after every reply. A fresh or resumed session shows the last known values until its first reply. Without the mod, the terminal CLI can feed the tray through `tray/statusline.py` as the `statusLine` command in `~/.claude/settings.json`:
+The band and the tray share `~/.claude/tray-state.json`, which the mod updates after every reply. A fresh or resumed session shows the last known values until its first reply. Without the mod, the terminal CLI can feed the tray through `usage-band/tray/statusline.py` as the `statusLine` command in `~/.claude/settings.json`:
 
 ```json
-{ "statusLine": { "type": "command", "command": "python /path/to/tray/statusline.py" } }
+{ "statusLine": { "type": "command", "command": "python /path/to/usage-band/tray/statusline.py" } }
 ```

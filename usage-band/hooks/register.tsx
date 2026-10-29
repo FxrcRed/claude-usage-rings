@@ -70,7 +70,7 @@ export const register: Register = on => {
       const state: Record<string, unknown> = { updated: Math.floor((await $.clock.now()) / 1000) }
       if (five) state.five_hour = { pct: five.percentUsed, resets_at: five.resetsAt && Date.parse(five.resetsAt) / 1000 }
       if (week) state.seven_day = { pct: week.percentUsed, resets_at: week.resetsAt && Date.parse(week.resetsAt) / 1000 }
-      // Optional tray feed: ~/.claude/tray-state.json (see tray/ in the repo)
+      // Optional tray feed: ~/.claude/tray-state.json (see usage-band/tray/ in the repo)
       const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
       if (home) {
         try {
