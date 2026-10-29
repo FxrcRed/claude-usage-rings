@@ -1,6 +1,6 @@
 # Claude usage rings
 
-**See your Claude plan usage limit at a glance: a live 5-hour and weekly usage indicator above the prompt box of the Claude desktop app (Claude Code), plus an optional Windows tray icon.**
+**See your Claude plan usage limit at a glance: a live 5-hour and weekly usage indicator above the prompt box of the Claude desktop app (Claude Code), so you no longer have to click the ring at the bottom right of the window just to read the percentage. Plus an optional Windows tray icon.**
 
 <p align="center">
   <img alt="Claude plan usage at a glance: the usage band above the prompt box in light and dark, the tray card with 5-hour and weekly rings, and the Windows tray icon showing the 5-hour percentage" src="docs/hero.png" width="800">
@@ -43,20 +43,13 @@ Left side: context size in `k` tokens and a short hint. Right side: percent and 
 | What | Green | Orange | Red |
 | --- | --- | --- | --- |
 | 5-hour / weekly usage | below 60% | 60–85% | 85% and up |
-| Context length | below 180k | 180k and up ("Time to start a new chat") | 230k and up |
+| Context length | below 180k ("Fine to keep going here") | 180k and up ("Time to start a new chat") | 230k and up |
 
 The context figures include roughly 80k tokens of fixed overhead (system prompt, tools, skills). A "5-hour limit almost used" note appears at 90% and up.
 
 ## Optional: Windows tray icon
 
 The `tray/` folder holds a small Windows tray program. The icon shows your 5-hour percentage on a green / orange / red tile. Click it to open a card with the 5-hour and weekly rings and their reset countdowns; click elsewhere or press Esc to close it. It follows the Windows light / dark theme.
-
-<p align="center">
-  <picture>
-    <source media="(prefers-color-scheme: dark)" srcset="docs/tray-popup-dark.png">
-    <img alt="Tray popup with a 5-hour ring and a weekly ring" src="docs/tray-popup-light.png" width="280">
-  </picture>
-</p>
 
 ```
 pip install -r tray/requirements.txt
@@ -75,9 +68,15 @@ Right-click the icon and choose **Quit** to exit. On Windows 11, drag the icon o
 
 - Needs a plan that reports rate-limit data (Pro / Max). On API-key, Bedrock or Vertex setups there is nothing to show.
 - Built for the Claude desktop app. Other surfaces may draw the band differently or not at all.
-- The band's colors are fixed and cannot follow the light / dark theme of the app. The text tones sit between Apple's light and dark variants so they stay readable on both.
+- The band's background follows the app's light / dark theme, as in the screenshots above. Its text and ring colors are fixed: the text tones sit between Apple's light and dark variants so they stay readable on both.
 - The tray program is Windows only.
 - Numbers refresh when a message is sent, not continuously: an idle session does not update them.
+
+## Troubleshooting
+
+- **The band does not appear**: send one message first, because the usage numbers arrive with the first API response of a session. Also check that your plan is Pro or Max and that Claude Code is 2.1.275 or later.
+- **The numbers do not change**: they refresh when a message is sent, not continuously, so an idle session keeps its last values.
+- **The tray icon shows `--`**: the tray has had no update for 30 minutes, or the reset time of the window has passed. Send a message in any session with the plugin installed.
 
 ## Frequently asked
 
