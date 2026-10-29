@@ -108,7 +108,14 @@ export const register: Register = on => {
     const { Box, Text, Svg } = $.ui.resolve(e)
     const ctx = pick(all, 'context')?.percentUsed
     if (!five && !week && !ctx) return next(e)
-    const line = (l: Limit | undefined, showTime: boolean) => {
+    // The app's own prompts (surveys, option cards) own this band while they are up: keep the numbers in the status line meanwhile
+    if (e.props.hasSurvey) {
+      const text = (name: string, l: Limit | undefined) => (l ? `${name} ${Math.round(l.percentUsed)}%${l.resetsAt ? ` · ${left(l.resetsAt, now)}` : ''}` : undefined)
+      $.ui.status([text('5h', five), (week?.percentUsed ?? 0) >= 80 ? text('week', week) : undefined].filter(Boolean).join('   ') || undefined)
+      return next(e)
+    }
+    $.ui.status(undefined)
+    const line =(l: Limit | undefined, showTime: boolean) => {
       const p = l ? Math.round(l.percentUsed) : 0
       return (
         <Box flexDirection="row" alignItems="center" gap={1}>
