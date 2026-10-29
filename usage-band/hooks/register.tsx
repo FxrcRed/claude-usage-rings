@@ -36,6 +36,9 @@ const pick = (all: Limit[], kind: string) => all.find(l => l.kind === kind)
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
+    // The engine caches the drawing: without this the "time left" freezes between replies, and the band
+    // stays gone for a while after one of the app's own prompts has taken its place
+    $.clock.every(15000, () => $.ui.invalidate('ui.render'))
     const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
     // A session has no rate-limit data until its first reply: show the last known values meanwhile
     void (async () => {
@@ -67,14 +70,20 @@ export const register: Register = on => {
     if (e.rateLimits.length > 0) {
       const five = pick(e.rateLimits, 'five_hour')
       const week = pick(e.rateLimits, 'seven_day')
-      const state: Record<string, unknown> = { updated: Math.floor((await $.clock.now()) / 1000) }
+      // Optional tray feed: ~/.claude/tray-state.json (see usage-band/tray/ in the repo); a window missing from this
+      // reply keeps its last value instead of being dropped
+      const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
+      const file = home ? `${home.replaceAll('\\', '/')}/.claude/tray-state.json` : undefined
+      let state: Record<string, unknown> = {}
+      try {
+        if (file) state = JSON.parse(await $.fs.read(file))
+      } catch {}
+      state.updated = Math.floor((await $.clock.now()) / 1000)
       if (five) state.five_hour = { pct: five.percentUsed, resets_at: five.resetsAt && Date.parse(five.resetsAt) / 1000 }
       if (week) state.seven_day = { pct: week.percentUsed, resets_at: week.resetsAt && Date.parse(week.resetsAt) / 1000 }
-      // Optional tray feed: ~/.claude/tray-state.json (see usage-band/tray/ in the repo)
-      const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
-      if (home) {
+      if (file) {
         try {
-          await $.fs.write(`${home.replaceAll('\\', '/')}/.claude/tray-state.json`, JSON.stringify(state))
+          await $.fs.write(file, JSON.stringify(state))
         } catch {}
       }
     }
