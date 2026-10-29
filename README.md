@@ -2,9 +2,12 @@
 
 **See your Claude plan usage limit at a glance: a live 5-hour and weekly usage indicator above the prompt box of the Claude desktop app (Claude Code), plus an optional Windows tray icon.**
 
-![The usage band above the prompt box](docs/usage-band.png)
-
-![The usage band in dark mode](docs/usage-band-dark.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/usage-band-dark.png">
+    <img alt="The usage band above the prompt box: context size, 5-hour percent and time left, and a usage ring" src="docs/usage-band-light.png" width="720">
+  </picture>
+</p>
 
 Anyone on a Claude Pro or Max plan eventually asks "how much of my 5-hour limit is left, and when does it reset?" This plugin answers that all the time, without opening a settings page or typing a command. It also tells you when your conversation has grown long enough that it is time to start a new chat.
 
@@ -51,7 +54,12 @@ The context figures include roughly 80k tokens of fixed overhead (system prompt,
 
 The `tray/` folder holds a small Windows tray program. The icon shows your 5-hour percentage on a green / orange / red tile. Click it to open a card with the 5-hour and weekly rings and their reset countdowns; click elsewhere or press Esc to close it. It follows the Windows light / dark theme.
 
-![Tray popup](docs/tray-popup.png)
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="docs/tray-popup-dark.png">
+    <img alt="Tray popup with a 5-hour ring and a weekly ring" src="docs/tray-popup-light.png" width="280">
+  </picture>
+</p>
 
 ```
 pip install -r tray/requirements.txt
