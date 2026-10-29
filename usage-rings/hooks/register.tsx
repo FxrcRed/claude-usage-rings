@@ -108,8 +108,6 @@ export const register: Register = on => {
     const { Box, Text, Svg } = $.ui.resolve(e)
     const ctx = pick(all, 'context')?.percentUsed
     if (!five && !week && !ctx) return next(e)
-    // Pinned under the prompt, so the number stays visible when an app prompt (option card) takes the band's place
-    $.ui.status(five ? `5h ${Math.round(five.percentUsed)}%` : undefined)
     const line = (l: Limit | undefined, showTime: boolean) => {
       const p = l ? Math.round(l.percentUsed) : 0
       return (
