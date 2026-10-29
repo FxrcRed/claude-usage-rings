@@ -62,7 +62,7 @@ export const register: Register = on => {
       $.clock.every(60000, async () => {
         if (busy) return
         busy = true
-        await run(['-Command', `if (-not (Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" | Where-Object { $_.CommandLine -match 'tray[.]py' })) { & '${ensure}' }`], 180000)
+        await run(['-Command', `if (-not (Get-CimInstance Win32_Process | Where-Object { $_.Name -eq 'pythonw.exe' -and $_.CommandLine -match 'tray[.]py' })) { & '${ensure}' }`], 180000)
         busy = false
       })
     }
