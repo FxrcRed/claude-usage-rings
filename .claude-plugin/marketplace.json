@@ -1,5 +1,13 @@
 {
   "name": "usage-band",
-  "owner": { "name": "FxrcRed" },
-  "plugins": [{ "name": "usage-band", "source": "./usage-band" }]
+  "owner": {
+    "name": "FxrcRed"
+  },
+  "plugins": [
+    {
+      "name": "usage-band",
+      "source": "./usage-band",
+      "description": "Live 5-hour and weekly Claude plan usage rings above the prompt in the Claude desktop app, plus a context-length hint and an optional Windows tray icon"
+    }
+  ]
 }

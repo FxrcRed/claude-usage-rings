@@ -3,6 +3,20 @@
   "version": "0.1.0",
   "description": "Shows 5-hour / weekly plan usage as activity rings above the prompt, plus a context-length hint, and feeds the optional tray icon",
   "types": "./types/index.d.ts",
-  "author": { "name": "FxrcRed" },
-  "license": "MIT"
+  "author": {
+    "name": "FxrcRed"
+  },
+  "license": "MIT",
+  "homepage": "https://github.com/FxrcRed/claude-usage-rings",
+  "repository": "https://github.com/FxrcRed/claude-usage-rings",
+  "keywords": [
+    "claude-code",
+    "claude-desktop",
+    "usage",
+    "rate-limit",
+    "5-hour-limit",
+    "weekly-limit",
+    "context-length",
+    "tray-icon"
+  ]
 }
