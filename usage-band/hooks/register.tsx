@@ -34,6 +34,30 @@ const rings = (five: number, week: number) =>
 const pick = (all: Limit[], kind: string) => all.find(l => l.kind === kind)
 
 export const register: Register = on => {
+  on('session.start', async ($, e, next) => {
+    const started = await next(e)
+    const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
+    // A session has no rate-limit data until its first reply: show the last known values meanwhile
+    void (async () => {
+      if (!home) return
+      try {
+        const s = JSON.parse(await $.fs.read(`${home.replaceAll('\\', '/')}/.claude/tray-state.json`))
+        const iso = (t: unknown) => (typeof t === 'number' ? new Date(t * 1000).toISOString() : undefined)
+        const seeded: Limit[] = []
+        if (s.five_hour) seeded.push({ kind: 'five_hour', percentUsed: s.five_hour.pct, resetsAt: iso(s.five_hour.resets_at) })
+        if (s.seven_day) seeded.push({ kind: 'seven_day', percentUsed: s.seven_day.pct, resetsAt: iso(s.seven_day.resets_at) })
+        await update($, limits, prev => (prev.length > 0 ? prev : seeded))
+      } catch {}
+    })()
+    // Windows: install the tray icon, start it and register it to start at login (no-op once done)
+    if ((await $.env.get('OS')) === 'Windows_NT') {
+      void $.process
+        .run(['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', `${$.plugin.root}/tray/ensure-tray.ps1`], { timeoutMs: 180000 })
+        .catch(() => {})
+    }
+    return started
+  })
+
   on('session.measure', async ($, e, next) => {
     const tokens = e.context?.tokens
     await update($, limits, prev => [
