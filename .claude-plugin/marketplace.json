@@ -1,5 +1,6 @@
 {
   "name": "usage-rings",
+  "description": "Claude plan usage rings for the Claude desktop app",
   "owner": {
     "name": "FxrcRed"
   },
