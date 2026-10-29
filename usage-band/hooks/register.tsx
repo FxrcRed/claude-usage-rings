@@ -52,11 +52,19 @@ export const register: Register = on => {
         await update($, limits, prev => (prev.length > 0 ? prev : seeded))
       } catch {}
     })()
-    // Windows: install the tray icon, start it and register it to start at login (no-op once done)
+    // Windows: install the tray icon, start it and register it to start at login (no-op once done), and
+    // bring it back within a minute if something kills it (e.g. another app running Stop-Process -Name pythonw)
     if ((await $.env.get('OS')) === 'Windows_NT') {
-      void $.process
-        .run(['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', '-File', `${$.plugin.root}/tray/ensure-tray.ps1`], { timeoutMs: 180000 })
-        .catch(() => {})
+      const ensure = `${$.plugin.root}/tray/ensure-tray.ps1`
+      const run = (args: string[], timeoutMs: number) => $.process.run(['powershell', '-NoProfile', '-ExecutionPolicy', 'Bypass', ...args], { timeoutMs }).catch(() => {})
+      void run(['-File', ensure], 180000)
+      let busy = false
+      $.clock.every(60000, async () => {
+        if (busy) return
+        busy = true
+        await run(['-Command', `if (-not (Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" | Where-Object { $_.CommandLine -match 'tray[.]py' })) { & '${ensure}' }`], 180000)
+        busy = false
+      })
     }
     return started
   })

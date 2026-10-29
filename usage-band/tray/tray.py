@@ -202,6 +202,10 @@ class Popup:
 
 
 def main():
+    # single instance: the mod re-launches the tray when it dies, and two sessions may do so at once
+    ctypes.windll.kernel32.CreateMutexW(None, False, "ClaudeUsageTray")
+    if ctypes.windll.kernel32.GetLastError() == 183:  # ERROR_ALREADY_EXISTS
+        return
     try:
         ctypes.windll.shcore.SetProcessDpiAwareness(2)
     except Exception:
