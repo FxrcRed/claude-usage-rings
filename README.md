@@ -2,6 +2,8 @@
 
 **See your Claude plan usage limit at a glance: a live 5-hour and weekly usage indicator above the prompt box of the Claude desktop app (Claude Code), plus an optional Windows tray icon.**
 
+![The usage band above the prompt box](docs/usage-band.png)
+
 Anyone on a Claude Pro or Max plan eventually asks "how much of my 5-hour limit is left, and when does it reset?" This plugin answers that all the time, without opening a settings page or typing a command. It also tells you when your conversation has grown long enough that it is time to start a new chat.
 
 - **5-hour limit**: percent used and time until it resets
