@@ -108,6 +108,10 @@ export const register: Register = on => {
     const { Box, Text, Svg } = $.ui.resolve(e)
     const ctx = pick(all, 'context')?.percentUsed
     if (!five && !week && !ctx) return next(e)
+    // Narrow window: keep only the numbers; no Svg (terminal): text only
+    const cols = (e as any).props?.bodyColumns ?? (e as any).viewport?.columns
+    const narrow = typeof cols === 'number' && cols < 70
+    const showRings = !!Svg && (e as any).surface !== 'terminal'
     const line = (l: Limit | undefined, showTime: boolean) => {
       const p = l ? Math.round(l.percentUsed) : 0
       return (
@@ -129,26 +133,26 @@ export const register: Register = on => {
               {`${Math.round(ctx / 1000)}k`}
             </Text>
           ) : null}
-        {ctx && ctx >= 180000 ? (
+        {narrow ? null : ctx && ctx >= 180000 ? (
           <Text size="caption" color={ctx >= 230000 ? RED.text : ORANGE.text}>Time to start a new chat</Text>
         ) : ctx ? (
           <Text size="caption" dimColor>Fine to keep going here</Text>
         ) : null}
-        {(five?.percentUsed ?? 0) >= 90 ? (
+        {!narrow && (five?.percentUsed ?? 0) >= 90 ? (
           <Text size="caption" color={RED.text}>5-hour limit almost used</Text>
         ) : null}
       </Box>
       <Box flexDirection="row" alignItems="center" gap={1}>
         <Box flexDirection="row" alignItems="center" gap={2}>
-          {line(five, true)}
-          {(week?.percentUsed ?? 0) >= 80 ? line(week, true) : null}
+          {line(five, !narrow)}
+          {!narrow && (week?.percentUsed ?? 0) >= 80 ? line(week, true) : null}
         </Box>
-        <Svg
+        {showRings ? <Svg
           source={rings(five?.percentUsed ?? 0, week?.percentUsed ?? 0)}
           alt={`5-hour ${Math.round(five?.percentUsed ?? 0)}%, weekly ${Math.round(week?.percentUsed ?? 0)}%`}
           width={26}
           height={22}
-        />
+        /> : null}
       </Box>
       </Box>
     )
