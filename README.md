@@ -65,7 +65,7 @@ Left: context size in `k` tokens and a hint. Right: percent and time left for th
 
 - Context figures include roughly 80k tokens of fixed overhead (system prompt, tools, skills).
 - A "5-hour limit almost used" note appears at 90%.
-- In a narrow window (under 70 columns) only the percentages and rings stay.
+- In a narrow window (under 50 columns) only the percentages and rings stay.
 - Without drawing support (terminal) the rings give way to text.
 
 ## Windows tray icon

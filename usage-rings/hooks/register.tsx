@@ -110,7 +110,7 @@ export const register: Register = on => {
     if (!five && !week && !ctx) return next(e)
     // Narrow window: keep only the numbers; no Svg (terminal): text only
     const cols = (e as any).props?.bodyColumns ?? (e as any).viewport?.columns
-    const narrow = typeof cols === 'number' && cols < 70
+    const narrow = typeof cols === 'number' && cols < 50
     const showRings = !!Svg && (e as any).surface !== 'terminal'
     const line = (l: Limit | undefined, showTime: boolean) => {
       const p = l ? Math.round(l.percentUsed) : 0

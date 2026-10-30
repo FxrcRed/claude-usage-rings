@@ -36,7 +36,7 @@ test('a wide band shows percent used and time left for the 5-hour window', async
 })
 
 test('a narrow band drops the reset time and the weekly figure', async ($, on) => {
-  const band = await mount($, on, 'desktop', 40, [{ ...WINDOWS[0], percentUsed: 58 }, { ...WINDOWS[1], percentUsed: 90 }])
+  const band = await mount($, on, 'desktop', 30, [{ ...WINDOWS[0], percentUsed: 58 }, { ...WINDOWS[1], percentUsed: 90 }])
   expect(await band.find({ text: '58%' })).toBeDefined()
   expect(await band.find({ text: '2h 0m' })).toBeUndefined()
   expect(await band.find({ text: '90%' })).toBeUndefined()
