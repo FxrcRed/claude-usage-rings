@@ -27,7 +27,8 @@ $sc.WorkingDirectory = $dir
 $sc.Save()
 
 # Stop icons started from the plugin folder by older versions, or running an outdated copy.
-$running = @(Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" | Where-Object { $_.CommandLine -match 'tray\.py' })
+# Only this plugin's icon: its copy, or tray.py under a usage-rings / usage-band (old name) plugin folder.
+$running = @(Get-CimInstance Win32_Process -Filter "Name='pythonw.exe'" | Where-Object { $_.CommandLine -match 'usage-(rings|band)[^"]*[\\/]tray\.py' })
 $stale = $running | Where-Object { $changed -or -not $_.CommandLine.Contains($tray) }
 $stale | ForEach-Object { Stop-Process -Id $_.ProcessId -Force }
 if ($running.Count -eq @($stale).Count) {
