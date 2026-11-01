@@ -46,6 +46,8 @@ claude plugin install usage-rings --marketplace FxrcRed/claude-usage-rings
 
 In the desktop app, where `/plugin` does not run: open **Customize**, then **Plugins**, click **Add**, choose **Add marketplace**, then **Add from a repository**, enter `FxrcRed/claude-usage-rings` and click **Sync**. The plugin then shows up under "From marketplaces you added".
 
+If you removed the marketplace in the app and add it back, the app may keep saying "This marketplace is already added" and refuse to sync, even though it is gone. Install from a terminal instead with the `claude plugin install` command above.
+
 Answer `y` to add the marketplace and pick user scope (every session). Before a session's first reply the band shows the last known numbers; after that it is live.
 
 Upgrading from `usage-band` (the old name): `claude plugin uninstall usage-band`, then install as above.
