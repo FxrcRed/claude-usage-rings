@@ -44,7 +44,7 @@ From a shell:
 claude plugin install usage-rings --marketplace FxrcRed/claude-usage-rings
 ```
 
-In the desktop app, where `/plugin` does not run: click **+** next to the prompt box, then **Plugins**, **Add marketplace** with `FxrcRed/claude-usage-rings`, then **Add plugin**.
+In the desktop app, where `/plugin` does not run: open **Customize**, then **Plugins**, click **Add**, choose **Add marketplace**, then **Add from a repository**, enter `FxrcRed/claude-usage-rings` and click **Sync**. The plugin then shows up under "From marketplaces you added".
 
 Answer `y` to add the marketplace and pick user scope (every session). Before a session's first reply the band shows the last known numbers; after that it is live.
 
@@ -76,9 +76,9 @@ On Windows the plugin also shows the 5-hour percentage in the system tray (green
   <img alt="The tray icon on a light and a dark taskbar (no data, 13, 52, 68, 92) and the card with both rings" src="docs/tray-states.png" width="800">
 </p>
 
-Nothing to run. At session start the plugin runs `usage-rings/tray/ensure-tray.ps1`, which installs `pillow` and `pystray` with pip if missing (needs Python on `PATH`), adds `ClaudeTray.lnk` to your Startup folder, and starts the icon. While a session is open it restarts the icon within a minute if something closes it. Without Python, the script does nothing and the band works on its own. Windows 11 hides new icons under `^`: drag it onto the taskbar once.
+Nothing to run. At session start the plugin runs `usage-rings/tray/ensure-tray.ps1`, which installs `pillow` and `pystray` with pip if missing (needs Python on `PATH`), copies the icon script to `~/.claude/usage-rings-tray/` (so plugin updates are never blocked by the running icon), adds `ClaudeTray.lnk` to your Startup folder, and starts the icon. While a session is open it restarts the icon within a minute if something closes it. Without Python, the script does nothing and the band works on its own. Windows 11 hides new icons under `^`: drag it onto the taskbar once.
 
-To remove: uninstall the plugin first (otherwise the icon returns), quit the icon from its right-click menu, and delete `ClaudeTray.lnk` from `shell:startup`.
+To remove: uninstall the plugin first (otherwise the icon returns), quit the icon from its right-click menu, delete `ClaudeTray.lnk` from `shell:startup`, and delete `~/.claude/usage-rings-tray/`.
 
 The band and tray share `~/.claude/tray-state.json`. In a terminal-only setup, the CLI can feed the tray by pointing `statusLine` in `~/.claude/settings.json` at `usage-rings/tray/statusline.py`.
 
