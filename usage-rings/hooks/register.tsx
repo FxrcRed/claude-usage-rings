@@ -30,7 +30,9 @@ const ring = (r: number, p: number, color: string) => {
 }
 
 const rings = (five: number, week: number) =>
-  `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="22" viewBox="-5.45 0 35.45 30">${ring(12.2, five, shade(five).ring)}${ring(7.2, week, shade(week).ring)}</svg>`
+  `<svg xmlns="http://www.w3.org/2000/svg" width="26" height="22" viewBox="0 0 35.45 30">${ring(12.2, five, shade(five).ring)}${ring(7.2, week, shade(week).ring)}</svg>`
+
+const SPACER = '<svg xmlns="http://www.w3.org/2000/svg" width="4" height="1"/>'
 
 const pick = (all: Limit[], kind: string) => all.find(l => l.kind === kind)
 
@@ -154,9 +156,13 @@ export const register: Register = on => {
       <Box flexDirection="row" justifyContent="space-between" alignItems="center" width="100%">
       <Box flexDirection="row" alignItems="center" gap={2}>
         {ctx ? (
+          <Box flexDirection="row" alignItems="center">
+            {/* 4px spacer: centers the number under the prompt's + button, as the ring sits over the mic */}
+            {showRings ? <Svg source={SPACER} alt="" width={4} height={1} /> : null}
             <Text size="caption" tabular dimColor={!ctxColor(ctx)} weight={ctx >= 180000 ? 'medium' : undefined} color={ctxColor(ctx)}>
               {`${Math.round(ctx / 1000)}k`}
             </Text>
+          </Box>
           ) : null}
         {narrow ? null : ctx && ctx >= 180000 ? (
           <Text size="caption" color={ctx >= 230000 ? RED.text : ORANGE.text}>Time to start a new chat</Text>
