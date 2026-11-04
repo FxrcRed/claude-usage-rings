@@ -1,9 +1,10 @@
 import { atom, read, update } from 'claude-code'
-import type { Register } from 'claude-code'
+import type { EngineInterface, Register } from 'claude-code'
 
 import type { Limit } from '../types'
 
-const limits = atom({ plugin: 'usage-rings', key: 'limits' } as const, [] as Limit[])
+// `applied`: `updated` of the tray file as this session last wrote or adopted it; a newer file is another window's reply
+const usage = atom({ plugin: 'usage-rings', key: 'state' } as const, { limits: [] as Limit[], applied: 0 })
 
 // Apple system colours; the text tones sit between Apple's light and dark variants so they read on both themes
 const GREEN = { ring: '#34c759', text: '#2a9d4b' }
@@ -33,25 +34,44 @@ const rings = (five: number, week: number) =>
 
 const pick = (all: Limit[], kind: string) => all.find(l => l.kind === kind)
 
+// Every window (and the CLI's statusline.py) writes its latest reading here, so a window that is idle or deep in
+// a long command can follow what the others have used since its own last reply
+const trayFile = async ($: EngineInterface) => {
+  const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
+  return home ? `${home.replaceAll('\\', '/')}/.claude/tray-state.json` : undefined
+}
+
+// Takes the tray file's reading over this session's own when it is the newer: how a window that is idle or deep
+// in a long command follows the other windows' replies
+const adopt = async ($: EngineInterface) => {
+  try {
+    const file = await trayFile($)
+    if (!file) return
+    const s = JSON.parse(await $.fs.read(file))
+    if (typeof s.updated !== 'number') return
+    const iso = (t: unknown) => (typeof t === 'number' ? new Date(t * 1000).toISOString() : undefined)
+    const seeded: Limit[] = []
+    if (s.five_hour) seeded.push({ kind: 'five_hour', percentUsed: s.five_hour.pct, resetsAt: iso(s.five_hour.resets_at) })
+    if (s.seven_day) seeded.push({ kind: 'seven_day', percentUsed: s.seven_day.pct, resetsAt: iso(s.seven_day.resets_at) })
+    if (seeded.length === 0) return
+    await update($, usage, prev => {
+      // Decided as the store applies it, so a reply of this session that landed meanwhile keeps the upper hand
+      if (s.updated <= prev.applied) return prev
+      return { applied: s.updated, limits: [...prev.limits.filter(l => l.kind === 'context'), ...seeded] }
+    })
+  } catch {}
+}
+
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const started = await next(e)
     // The engine caches the drawing: without this the "time left" freezes between replies, and the band
     // stays gone for a while after one of the app's own prompts has taken its place
     $.clock.every(15000, () => $.ui.invalidate('ui.render'))
-    const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
-    // A session has no rate-limit data until its first reply: show the last known values meanwhile
-    void (async () => {
-      if (!home) return
-      try {
-        const s = JSON.parse(await $.fs.read(`${home.replaceAll('\\', '/')}/.claude/tray-state.json`))
-        const iso = (t: unknown) => (typeof t === 'number' ? new Date(t * 1000).toISOString() : undefined)
-        const seeded: Limit[] = []
-        if (s.five_hour) seeded.push({ kind: 'five_hour', percentUsed: s.five_hour.pct, resetsAt: iso(s.five_hour.resets_at) })
-        if (s.seven_day) seeded.push({ kind: 'seven_day', percentUsed: s.seven_day.pct, resetsAt: iso(s.seven_day.resets_at) })
-        await update($, limits, prev => (prev.length > 0 ? prev : seeded))
-      } catch {}
-    })()
+    // A session has no rate-limit data until its first reply: show the last known values meanwhile, and between
+    // its replies keep up with the other windows'
+    void adopt($)
+    $.clock.every(60000, () => adopt($))
     // Windows: install the tray icon, start it and register it to start at login (no-op once done), and
     // bring it back within a minute if something kills it (e.g. another app running Stop-Process -Name pythonw)
     if ((await $.env.get('OS')) === 'Windows_NT') {
@@ -71,22 +91,27 @@ export const register: Register = on => {
 
   on('session.measure', async ($, e, next) => {
     const tokens = e.context?.tokens
-    await update($, limits, prev => [
-      ...(e.rateLimits.length > 0 ? e.rateLimits : prev.filter(l => l.kind !== 'context')),
-      ...(tokens ? [{ kind: 'context', percentUsed: tokens }] : []),
-    ])
-    if (e.rateLimits.length > 0) {
+    const own = e.rateLimits.length > 0
+    const now = Math.floor((await $.clock.now()) / 1000)
+    await update($, usage, prev => ({
+      // Claimed in the step that stores the reading, so a tray read under way cannot put an older one over it
+      applied: own ? now : prev.applied,
+      limits: [
+        ...(own ? e.rateLimits : prev.limits.filter(l => l.kind !== 'context')),
+        ...(tokens ? [{ kind: 'context', percentUsed: tokens }] : []),
+      ],
+    }))
+    if (own) {
       const five = pick(e.rateLimits, 'five_hour')
       const week = pick(e.rateLimits, 'seven_day')
       // Optional tray feed: ~/.claude/tray-state.json (see usage-rings/tray/ in the repo); a window missing from this
       // reply keeps its last value instead of being dropped
-      const home = (await $.env.get('USERPROFILE')) ?? (await $.env.get('HOME'))
-      const file = home ? `${home.replaceAll('\\', '/')}/.claude/tray-state.json` : undefined
+      const file = await trayFile($)
       let state: Record<string, unknown> = {}
       try {
         if (file) state = JSON.parse(await $.fs.read(file))
       } catch {}
-      state.updated = Math.floor((await $.clock.now()) / 1000)
+      state.updated = now
       if (five) state.five_hour = { pct: five.percentUsed, resets_at: five.resetsAt && Date.parse(five.resetsAt) / 1000 }
       if (week) state.seven_day = { pct: week.percentUsed, resets_at: week.resetsAt && Date.parse(week.resetsAt) / 1000 }
       if (file) {
@@ -99,7 +124,7 @@ export const register: Register = on => {
   })
 
   on('ui.render', { component: 'AbovePrompt' }, async ($, e, next) => {
-    const all = await read($, limits)
+    const all = (await read($, usage)).limits
     const now = await $.clock.now()
     const fresh = (l: Limit | undefined) =>
       l && l.resetsAt && Date.parse(l.resetsAt) <= now ? { ...l, percentUsed: 0, resetsAt: undefined } : l

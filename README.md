@@ -48,7 +48,7 @@ In the desktop app, where `/plugin` does not run: open **Customize**, then **Plu
 
 If you removed the marketplace in the app and add it back, the app may keep saying "This marketplace is already added" and refuse to sync, even though it is gone. Install from a terminal instead with the `claude plugin install` command above.
 
-Answer `y` to add the marketplace and pick user scope (every session). Before a session's first reply the band shows the last known numbers; after that it is live.
+Answer `y` to add the marketplace and pick user scope (every session). Before a session's first reply the band shows the last known numbers; after that it is live, and an idle window follows the replies of the other windows within a minute.
 
 Upgrading from `usage-band` (the old name): `claude plugin uninstall usage-band`, then install as above.
 

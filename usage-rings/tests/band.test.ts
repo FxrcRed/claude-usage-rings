@@ -16,11 +16,24 @@ const PROPS = {
 
 // The plugin writes ~/.claude/tray-state.json and, on Windows, starts the tray: point both elsewhere
 const ENV = { USERPROFILE: 'C:/Users/26935/AppData/Local/Temp/usage-rings-test', OS: 'test' }
+const TRAY = `${ENV.USERPROFILE}/.claude/tray-state.json`
+
+let clock: any
+// The file system the plugin sees: in memory, empty at the start of each test; the engine hands the hooks
+// native paths, so keys are kept with forward slashes
+let files: Map<string, string>
+const key = (path: string) => path.replace(/\\/g, '/')
 
 const mount = async ($: any, on: any, surface: 'terminal' | 'desktop', bodyColumns: number, rateLimits = WINDOWS) => {
   mock.store(on)
   mock.env(on, ENV)
-  mock.clock(on, { now: NOW })
+  clock = mock.clock(on, { now: NOW })
+  files = new Map()
+  on('fs.read', ($: any, e: any) => ({ value: files.get(key(e.path)) ?? '{}' }))
+  on('fs.write', ($: any, e: any) => {
+    files.set(key(e.path), e.text)
+    return { value: undefined }
+  })
   on('session.start', ($, e) => ({ cwd: e.cwd }))
   on('session.measure', ($, e) => ({ changed: e.changed }))
   await $.session.start({ surface, isInteractive: true, cwd: '/work' })
@@ -53,5 +66,18 @@ test('the terminal draws no rings', async ($, on) => {
 test('a window whose reset time has passed reads as unused', async ($, on) => {
   const band = await mount($, on, 'desktop', 100, [{ kind: 'five_hour', percentUsed: 58, resetsAt: '2098-12-31T21:00:00Z' }])
   expect(await band.find({ text: '0%' })).toBeDefined()
+  await band.unmount()
+})
+
+test("another window's reply reaches the band within a minute", async ($, on) => {
+  const band = await mount($, on, 'desktop', 100)
+  expect(await band.find({ text: '58%' })).toBeDefined()
+  expect(JSON.parse(files.get(TRAY)!).five_hour.pct).toBe(58)
+  files.set(TRAY, JSON.stringify({ updated: NOW / 1000 + 30, five_hour: { pct: 61, resets_at: Date.parse(WINDOWS[0].resetsAt) / 1000 } }))
+  await clock.advance(60000)
+  // One more redraw tick, so the band is drawn after the file was read
+  await clock.advance(15000)
+  expect(await band.find({ text: '61%' })).toBeDefined()
+  expect(await band.find({ text: '58%' })).toBeUndefined()
   await band.unmount()
 })
